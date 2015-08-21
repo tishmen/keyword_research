@@ -3,7 +3,7 @@ from django.db import models
 
 class Keyword(models.Model):
 
-    keyword = models.CharField(max_length=100, unique=True)
+    keyword = models.TextField(unique=True)
     date_added = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -13,9 +13,17 @@ class Keyword(models.Model):
 class Result(models.Model):
 
     keyword = models.ForeignKey('Keyword')
-    url = models.URLField()
+    url = models.TextField()
     position = models.IntegerField()
     date_added = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.url
+
+
+class Link(models.Model):
+
+    url = models.TextField()
 
     def __str__(self):
         return self.url
@@ -24,9 +32,11 @@ class Result(models.Model):
 class Content(models.Model):
 
     result = models.ForeignKey('Result')
+    links = models.ManyToManyField('Link')
     html = models.TextField()
-    title = models.TextField(null=True)
-    body = models.TextField(null=True)
+    title = models.TextField()
+    body_html = models.TextField()
+    body = models.TextField()
     date_added = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
