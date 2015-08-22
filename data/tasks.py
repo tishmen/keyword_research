@@ -19,6 +19,15 @@ def scrape_google_results_task(self, keyword):
 
 
 @shared_task(bind=True)
+def scrape_google_result_count_task(self, keyword):
+    try:
+        google_results.scrape_count(keyword)
+    except Exception:
+        log.error('Traceback: %s', traceback.format_exc())
+        raise
+
+
+@shared_task(bind=True)
 def scrape_contents_task(self, result):
     try:
         contents.scrape(result)

@@ -22,3 +22,15 @@ def scrape(keyword):
             position=i + 1,
         )
         result.save()
+
+
+def scrape_count(keyword):
+    start_url = 'https://www.google.com/search?q={}'.format(keyword)
+    response = requests.get(start_url)
+    soup = BeautifulSoup(response.content, 'html.parser')
+    result_count = soup.find(id='resultStats').string
+    result_count_cleaned = int(
+        ''.join(filter(lambda x: x.isdigit(), result_count))
+    )
+    keyword.result_count = result_count_cleaned
+    keyword.save()

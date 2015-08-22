@@ -19,7 +19,7 @@ def scrape(result):
         html=soup.prettify(),
         title=document.short_title(),
         body_html=body_soup.prettify(),
-        body=body_soup.get_text(),
+        body=body_soup.get_text().strip(),
     )
     content.save()
     content.links.add(*links)
