@@ -1,10 +1,16 @@
 from django.contrib import admin, messages
 
-from data.models import Keyword, Result, Content, Statistic
+from data.models import Keyword, Result, Content, Summary, Statistic
 from data.tasks import (
     scrape_google_results_task, scrape_google_result_count_task,
-    scrape_contents_task, process_contents_task
+    scrape_contents_task, create_summary_task, process_contents_task
 )
+
+
+class SummaryInline(admin.StackedInline):
+
+    model = Summary
+    extra = 0
 
 
 class StatisticInline(admin.StackedInline):
@@ -81,10 +87,10 @@ class ResultAdmin(admin.ModelAdmin):
 @admin.register(Content)
 class ContentAdmin(admin.ModelAdmin):
 
-    list_display = ('result', 'title')
+    list_display = ('result', 'title', 'word_count')
     exclude = ('html', 'body_html')
-    actions = ('process_contents', )
-    inlines = (StatisticInline, )
+    actions = ('process_contents', 'create_summary')
+    inlines = (SummaryInline, StatisticInline)
 
     def process_contents(self, request, queryset):
         count = queryset.count()
@@ -100,5 +106,20 @@ class ContentAdmin(admin.ModelAdmin):
             level=messages.SUCCESS
         )
 
+    def create_summary(self, request, queryset):
+        count = queryset.count()
+        for content in queryset:
+            create_summary_task.delay(content)
+        if count == 1:
+            message_bit = '1 content'
+        else:
+            message_bit = '{} contents'.format(count)
+        self.message_user(
+            request,
+            'Delayed create_summary_task for {}'.format(message_bit),
+            level=messages.SUCCESS
+        )
+
     process_contents.short_description = 'process_contents for selected conte'\
         'nts'
+    create_summary.short_description = 'create_summary for selected contents'

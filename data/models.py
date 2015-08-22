@@ -32,12 +32,16 @@ class Link(models.Model):
 
 class Content(models.Model):
 
+    class Meta:
+        verbose_name_plural = 'Content'
+
     result = models.ForeignKey('Result')
     links = models.ManyToManyField('Link')
     html = models.TextField()
     title = models.TextField()
     body_html = models.TextField()
     body = models.TextField()
+    word_count = models.IntegerField(default=0)
     date_added = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -46,9 +50,11 @@ class Content(models.Model):
 
 class Summary(models.Model):
 
+    class Meta:
+        verbose_name_plural = 'Summaries'
+
     content = models.ForeignKey('Content')
     summary = models.TextField()
-    count = models.IntegerField()
 
 
 class Statistic(models.Model):

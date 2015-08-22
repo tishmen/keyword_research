@@ -43,3 +43,12 @@ def process_contents_task(self, content):
     except Exception:
         log.error('Traceback: %s', traceback.format_exc())
         raise
+
+
+@shared_task(bind=True)
+def create_summary_task(self, content):
+    try:
+        contents_helpers.summarize(content)
+    except Exception:
+        log.error('Traceback: %s', traceback.format_exc())
+        raise
